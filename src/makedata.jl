@@ -9,19 +9,25 @@ function make_train_test_splits(num_reads; train_valid_test_ratio = [0.8, 0.1, 0
 end
 
 function obtain_training_and_test_set(
-    fastapath::String;
+    fastapaths::Vector{String};
     train_valid_test_ratio = [0.9, 0.1, 0.0],
     float_type = Float32,
 )
-    onehotarr, onehotarr_shuffled = fasta2dummy(fastapath; F=float_type)
-    
+    onehotarr, onehotarr_shuffled, data_seq_range = fasta2dummy(fastapaths; F=float_type)
+
     train_indices, test_indices, _, random_permuted_indices = 
         make_train_test_splits(size(onehotarr, 4);
         train_valid_test_ratio = train_valid_test_ratio)
+
+    # map the indices of the shuffled data to the original data
+    # shuffled -> original
+    permute_map = Dict(ind=>orig_ind for (ind, orig_ind) 
+        in enumerate(random_permuted_indices))
 
     training_set = @view onehotarr[:, :, :, train_indices]
     test_set = @view onehotarr[:, :, :, test_indices]
     training_set_shuffled = @view onehotarr_shuffled[:, :, :, train_indices]
     test_set_shuffled = @view onehotarr_shuffled[:, :, :, test_indices]
-    return training_set, test_set, training_set_shuffled, test_set_shuffled
+    return training_set, test_set, training_set_shuffled, test_set_shuffled, 
+           permute_map, data_seq_range
 end

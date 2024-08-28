@@ -52,6 +52,14 @@ function which_dataset(data_seq_range::Vector{UnitRange{Int}}, index::Int)
     return 0
 end
 
+function which_dataset(permute_map::Dict{Int, Int}
+    data_seq_range::Vector{UnitRange{Int}}, 
+    index::AbstractVector{Int})
+    orig_ind = permute_map[index]
+    return which_dataset(data_seq_range, orig_ind)
+end
+
+
 function fasta2dummy(fastapaths::Vector{String}; F::DataType, k = 1)
     dna_heads = Vector{String}()
     dna_reads = Vector{String}()
