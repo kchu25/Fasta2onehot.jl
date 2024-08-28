@@ -52,9 +52,8 @@ function which_dataset(data_seq_range::Vector{UnitRange{Int}}, index::Int)
     return 0
 end
 
-function which_dataset(permute_map::Dict{Int, Int}
-    data_seq_range::Vector{UnitRange{Int}}, 
-    index::AbstractVector{Int})
+function which_dataset(permute_map::Dict{Int, Int},
+    data_seq_range::Vector{UnitRange{Int}}, index::Vector{Int})
     orig_ind = permute_map[index]
     return which_dataset(data_seq_range, orig_ind)
 end
