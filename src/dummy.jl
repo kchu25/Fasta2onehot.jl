@@ -29,22 +29,55 @@ function data_2_dummy(dna_reads; F::DataType)
     return _S_
 end
 
-function fasta2dummy(fastapath; F::DataType, k = 1)
-    f = open(fastapath)
-    reads = read(f, String)
-    close(f)
+#=
+data_seq_range: Vector{UnitRange{Int}}
+    length of data_seq_range is the number of datasets
+    1st entry of data_seq_range is the range indices of the first dataset
+    2nd entry of data_seq_range is the range indices of the second dataset
+    ... and so on
+=#
+function get_fasta_range(seq_ends::Vector{Int})
+    data_seq_range = Vector{UnitRange{Int}}(undef, length(seq_ends))
+    data_seq_range[1] = 1:seq_ends[1]
+    for i = 2:length(seq_ends)
+        data_seq_range[i] = seq_ends[i-1]+1:seq_ends[i]
+    end
+    return data_seq_range
+end
+
+function which_dataset(data_seq_range::Vector{UnitRange{Int}}, index::Int)
+    for i = 1:length(data_seq_range)
+        index ∈ data_seq_range[i] && (return i)
+    end
+    return 0
+end
+
+function fasta2dummy(fastapaths::Vector{String}; F::DataType, k = 1)
     dna_heads = Vector{String}()
     dna_reads = Vector{String}()
     dna_reads_shuffled = Vector{String}()
-    for i in split(reads, ">")
-        if !isempty(i)
-            splits = split(i, "\n")
-            this_read_head = splits[1]
-            this_read = join(splits[2:end])
-            push!(dna_heads, this_read_head)
-            push!(dna_reads, this_read)
-            push!(dna_reads_shuffled, seq_shuffle(this_read; k = k))
+
+    seq_counter = 0
+    seq_ends = Int[]
+    for fastapath in fastapaths
+        f = open(fastapath)
+        reads = read(f, String)
+        close(f)
+        for i in split(reads, ">")
+            if !isempty(i)
+                splits = split(i, "\n")
+                this_read_head = splits[1]
+                this_read = join(splits[2:end])
+                push!(dna_heads, this_read_head)
+                push!(dna_reads, this_read)
+                push!(dna_reads_shuffled, seq_shuffle(this_read; k = k))
+                seq_counter += 1
+            end
         end
+        push!(seq_ends, copy(seq_counter))
     end
-    return data_2_dummy(dna_reads; F = F), data_2_dummy(dna_reads_shuffled; F = F)
+    data_seq_range = get_fasta_range(seq_ends)
+    return data_2_dummy(dna_reads; F = F), 
+           data_2_dummy(dna_reads_shuffled; F = F),
+           data_seq_range
 end

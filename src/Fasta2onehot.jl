@@ -5,6 +5,6 @@ using Random, SeqShuffle
 include("dummy.jl")
 include("makedata.jl")
 
-export obtain_training_and_test_set
+export obtain_training_and_test_set, which_dataset
 
 end
