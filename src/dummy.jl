@@ -17,7 +17,7 @@ function dna2dummy(dna_string::String, F::DataType)
     return v
 end
 
-function data_2_dummy(dna_reads; F = float_type)
+function data_2_dummy(dna_reads; F::DataType)
     how_many_strings = length(dna_reads)
     @assert how_many_strings != 0 "There aren't DNA strings found in the input"
     _len_ = unique(length.(dna_reads))
@@ -29,7 +29,7 @@ function data_2_dummy(dna_reads; F = float_type)
     return _S_
 end
 
-function fasta2dummy(fastapath; F = float_type, k = 1)
+function fasta2dummy(fastapath; F::DataType, k = 1)
     f = open(fastapath)
     reads = read(f, String)
     close(f)
