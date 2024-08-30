@@ -1,9 +1,12 @@
 function make_train_test_splits(num_reads; train_test_ratio = [0.8, 0.2])
     random_permuted_indices = shuffle(1:num_reads)
     train_end = floor(Int, num_reads * train_test_ratio[1])
-    train_indices = random_permuted_indices[1:train_end]
-    test_indices = random_permuted_indices[train_end+1:end]
-    return train_indices, test_indices, random_permuted_indices
+
+    # map the indices of the shuffled data to the original data
+    # shuffled index -> original index
+    permute_map_train = @view random_permuted_indices[1:train_end]
+    permute_map_test = @view random_permuted_indices[train_end+1:end]
+    return permute_map_train, permute_map_test
 end
 
 #=
@@ -17,17 +20,28 @@ data_seq_range: The range of the indices of the data in the original datasets, e
      The first dataset consists of the sequences with indices 1 to 173
      The second dataset consists of the sequences with indices 174 to 399
 =#
+
 struct onehot_data{T}
-    training_set::Array{T, 4}
-    training_set_shuffled::Array{T, 4}
-    test_set::Array{T, 4}
-    test_set_shuffled::Array{T, 4}
-    permute_map::Dict{Int, Int}
+    onehot_array::Array{T, 4}
+    onehot_array_shuffled::Array{T, 4}
+    training_set::AbstractArray{T, 4}
+    training_set_shuffled::AbstractArray{T, 4}
+    test_set::AbstractArray{T, 4}
+    test_set_shuffled::AbstractArray{T, 4}
+    permute_map_train::Vector{Int}
+    permute_map_test::Vector{Int}
     data_seq_range::Vector{UnitRange{Int}}
-    function onehot_data{T}(training_set, test_set, training_set_shuffled, test_set_shuffled, 
-        permute_map, data_seq_range) where {T <: Real}
-        new{T}(training_set, test_set, training_set_shuffled, test_set_shuffled, 
-            permute_map, data_seq_range)
+    function onehot_data{T}(onehotarr, onehotarr_shuffled, 
+            permute_map_train, permute_map_test, data_seq_range) where {T <: Real}
+        training_set          = @view onehotarr[:, :, :, permute_map_train]
+        training_set_shuffled = @view onehotarr_shuffled[:, :, :, permute_map_train]
+        test_set              = @view onehotarr[:, :, :, permute_map_test]
+        test_set_shuffled     = @view onehotarr_shuffled[:, :, :, permute_map_test]
+
+        new{T}(onehotarr, onehotarr_shuffled, 
+               training_set, training_set_shuffled, 
+               test_set, test_set_shuffled, 
+               permute_map_train, permute_map_test, data_seq_range)
     end
 end
 
@@ -40,26 +54,16 @@ function obtain_training_and_test_set(
     train_test_ratio = [0.9, 0.1],
     float_type = Float32,
 )
+    # load all the dna entries in the fasta files as onehot arrays
     onehotarr, onehotarr_shuffled, data_seq_range = 
         fasta2dummy(fastapaths; F=float_type)
 
-    train_indices, test_indices, random_permuted_indices = 
+    permute_map_train, permute_map_test = 
         make_train_test_splits(size(onehotarr, 4); train_test_ratio = train_test_ratio)
-
-    # map the indices of the shuffled data to the original data
-    # shuffled -> original
-    permute_map = Dict(ind=>orig_ind for (ind, orig_ind) 
-        in enumerate(random_permuted_indices))
-
-    training_set = @view onehotarr[:, :, :, train_indices]
-    test_set = @view onehotarr[:, :, :, test_indices]
-    training_set_shuffled = @view onehotarr_shuffled[:, :, :, train_indices]
-    test_set_shuffled = @view onehotarr_shuffled[:, :, :, test_indices]
-
-    return onehot_data{float_type}(training_set, 
-                                   training_set_shuffled,
-                                   test_set, 
-                                   test_set_shuffled, 
-                                   permute_map, 
+        
+    return onehot_data{float_type}(onehotarr, 
+                                   onehotarr_shuffled,
+                                   permute_map_train, 
+                                   permute_map_test,
                                    data_seq_range)
 end
