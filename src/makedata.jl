@@ -67,3 +67,26 @@ function obtain_training_and_test_set(
                                    permute_map_test,
                                    data_seq_range)
 end
+
+# for reproducing the same training and test set
+struct data_instance_meta
+    fastapaths::Vector{String}
+    permute_map_train::Vector{Int}
+    permute_map_test::Vector{Int}
+end
+
+fasta_get_meta_data(fasta_paths::Vector{String}, data_instance::onehot_data) = 
+    data_instance_meta(fasta_paths, data_instance.permute_map_test, data_instance.permute_map_train)
+
+# reproduce the same dataset using the saved meta data
+function obtain_training_and_test_set(meta_data::data_instance_meta; float_type = Float32)
+    onehotarr, onehotarr_shuffled, data_seq_range = 
+        fasta2dummy(meta_data.fastapaths; F=float_type)
+    permute_map_train, permute_map_test = 
+        meta_data.permute_map_train, meta_data.permute_map_test
+    return onehot_data{float_type}(onehotarr, 
+                                   onehotarr_shuffled,
+                                   permute_map_train, 
+                                   permute_map_test,
+                                   data_seq_range)
+end

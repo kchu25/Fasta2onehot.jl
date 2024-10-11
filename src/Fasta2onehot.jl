@@ -7,6 +7,7 @@ include("makedata.jl")
 
 export obtain_training_and_test_set, 
        which_dataset,
-       crosslink_mat_num_rows
+       crosslink_mat_num_rows,
+       fasta_get_meta_data
 
 end

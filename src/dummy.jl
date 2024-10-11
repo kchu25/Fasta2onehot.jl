@@ -58,7 +58,6 @@ function which_dataset(permute_map::Dict{Int, Int},
     return which_dataset(data_seq_range, orig_ind)
 end
 
-
 function fasta2dummy(fastapaths::Vector{String}; F::DataType, k = 1)
     dna_heads = Vector{String}()
     dna_reads = Vector{String}()
@@ -83,7 +82,11 @@ function fasta2dummy(fastapaths::Vector{String}; F::DataType, k = 1)
         end
         push!(seq_ends, copy(seq_counter))
     end
+
     data_seq_range = get_fasta_range(seq_ends)
+
+    # @info "data_seq_range: $data_seq_range"
+
     return data_2_dummy(dna_reads; F = F), 
            data_2_dummy(dna_reads_shuffled; F = F),
            data_seq_range
