@@ -53,10 +53,11 @@ function obtain_training_and_test_set(
     fastapaths::Vector{String};
     train_test_ratio = [0.9, 0.1],
     float_type = Float32,
+    crosslink=false
 )
     # load all the dna entries in the fasta files as onehot arrays
     onehotarr, onehotarr_shuffled, data_seq_range = 
-        fasta2dummy(fastapaths; F=float_type)
+        fasta2dummy(fastapaths; F=float_type, crosslink=crosslink)
 
     permute_map_train, permute_map_test = 
         make_train_test_splits(size(onehotarr, 4); train_test_ratio = train_test_ratio)
@@ -90,3 +91,5 @@ function obtain_training_and_test_set(meta_data::data_instance_meta; float_type 
                                    permute_map_test,
                                    data_seq_range)
 end
+
+
