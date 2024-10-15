@@ -20,7 +20,7 @@ end
 # given an index find its order in the data_seq_range
 function find_which(index, data_seq_range)
     for (ind, i) in enumerate(data_seq_range)
-        if i == index
+        if i.start ≤ index ≤ i.stop
             return ind
         end
     end
