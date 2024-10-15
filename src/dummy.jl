@@ -39,7 +39,7 @@ function _dummy_(dna_reads, str_len, how_many_strings, F::DataType; data_seq_ran
         _S_ = zeros(F, (4+length(data_seq_range), str_len, 1, how_many_strings))
         @inbounds for i = 1:how_many_strings
             _S_[1:4, :, 1, i] = dna2dummy(dna_reads[i], F)
-            which_crosslink = find_which(i, data_seq_range)
+            which_crosslink = find_which(i, data_seq_range) + 4 # offset of 4 for the nucleotides
             _S_[which_crosslink, crosslinked_position, 1, i] = 1
         end
         return _S_ # return a (4+length(data_seq_range), str_len, 1, how_many_strings) array
