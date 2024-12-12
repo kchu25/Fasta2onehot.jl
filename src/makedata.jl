@@ -45,6 +45,9 @@ struct onehot_data{T}
     end
 end
 
+get_num_seqs(data::onehot_data) = size(data.onehot_array, 4)
+get_seq_len(data::onehot_data) = size(data.onehot_array, 2)
+
 # return how many rows we should have in the crosslink matrix
 crosslink_mat_num_rows(data_instance::onehot_data) = 
     length(data_instance.data_seq_range)
