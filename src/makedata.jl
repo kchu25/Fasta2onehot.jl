@@ -33,9 +33,10 @@ struct onehot_data{T}
     data_seq_range::Vector{UnitRange{Int}}
     name::String
     cell_line::String
+    geo_accession::String
     function onehot_data{T}(onehotarr, onehotarr_shuffled, 
             permute_map_train, permute_map_test, data_seq_range; 
-            name="", cell_line="") where {T <: Real}
+            name="", cell_line="", geo_accession="") where {T <: Real}
         training_set          = @view onehotarr[:, :, :, permute_map_train]
         training_set_shuffled = @view onehotarr_shuffled[:, :, :, permute_map_train]
         test_set              = @view onehotarr[:, :, :, permute_map_test]
@@ -45,7 +46,7 @@ struct onehot_data{T}
                training_set, training_set_shuffled, 
                test_set, test_set_shuffled, 
                permute_map_train, permute_map_test, data_seq_range,
-               name, cell_line)
+               name, cell_line, geo_accession)
     end
 end
 
