@@ -33,10 +33,10 @@ struct onehot_data{T}
     data_seq_range::Vector{UnitRange{Int}}
     name::String
     cell_line::String
-    geo_accession::String
+    source::String
     function onehot_data{T}(onehotarr, onehotarr_shuffled, 
             permute_map_train, permute_map_test, data_seq_range; 
-            name="", cell_line="", geo_accession="") where {T <: Real}
+            name="", cell_line="", source::String="") where {T <: Real}
         training_set          = @view onehotarr[:, :, :, permute_map_train]
         training_set_shuffled = @view onehotarr_shuffled[:, :, :, permute_map_train]
         test_set              = @view onehotarr[:, :, :, permute_map_test]
@@ -46,7 +46,8 @@ struct onehot_data{T}
                training_set, training_set_shuffled, 
                test_set, test_set_shuffled, 
                permute_map_train, permute_map_test, data_seq_range,
-               name, cell_line, geo_accession)
+               name, cell_line,     source::String
+               )
     end
 end
 
@@ -60,9 +61,10 @@ for displaying the results in html
 function generate_meta_str(data::onehot_data)
     protein_name = isempty(data.name) ? "" : "<li> Protein name: $(data.name) </li>"
     cell_info = isempty(data.cell_line) ? "" : "<li> Cell line: $(data.cell_line) </li>"
+    geo_accession = isempty(data.geo_accession) ? "" : "<li> GEO accession: $(data.geo_accession) </li>"
     num_seqs = "<li> Number of sequences: $(get_num_seqs(data)) </li>"
     seq_len = "<li> Sequence length: $(get_seq_len(data)) </li>"
-    meta_str = protein_name * cell_info * num_seqs * seq_len
+    meta_str = protein_name * cell_info * geo_accession * num_seqs * seq_len
     return meta_str
 end
 
