@@ -78,7 +78,8 @@ function obtain_training_and_test_set(
     float_type = Float32,
     crosslink=false,
     name="",
-    cell_line =""
+    cell_line ="",
+    source=""
 )
     # load all the dna entries in the fasta files as onehot arrays
     onehotarr, onehotarr_shuffled, data_seq_range = 
@@ -93,7 +94,8 @@ function obtain_training_and_test_set(
                                    permute_map_test,
                                    data_seq_range;
                                    name=name,
-                                   cell_line=cell_line)
+                                   cell_line=cell_line,
+                                   source=source)
 end
 
 # for reproducing the same training and test set
