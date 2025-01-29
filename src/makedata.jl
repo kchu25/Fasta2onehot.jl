@@ -61,10 +61,10 @@ for displaying the results in html
 function generate_meta_str(data::onehot_data)
     protein_name = isempty(data.name) ? "" : "<li> Protein name: $(data.name) </li>"
     cell_info = isempty(data.cell_line) ? "" : "<li> Cell line: $(data.cell_line) </li>"
-    geo_accession = isempty(data.geo_accession) ? "" : "<li> GEO accession: $(data.geo_accession) </li>"
+    source = isempty(data.source) ? "" : "<li> Source: $(data.source) </li>"
     num_seqs = "<li> Number of sequences: $(get_num_seqs(data)) </li>"
     seq_len = "<li> Sequence length: $(get_seq_len(data)) </li>"
-    meta_str = protein_name * cell_info * geo_accession * num_seqs * seq_len
+    meta_str = protein_name * cell_info * source * num_seqs * seq_len
     return meta_str
 end
 
